@@ -21,10 +21,10 @@ function renderProjects(list) {
     .join('');
 }
 renderProjects(myProjects);
-const searchInput = document.querySelector('#search-input');
-if (searchInput) {
-  searchInput.addEventListener('input', () => {
-    const value = searchInput.value.toLowerCase();
+const projectsSearchInput = document.querySelector('#projects-search-input');
+if (projectsSearchInput) {
+  projectsSearchInput.addEventListener('input', () => {
+    const value = projectsSearchInput.value.toLowerCase();
     const filtered = myProjects.filter(project =>
       project.title.toLowerCase().includes(value)
     );
@@ -32,6 +32,7 @@ if (searchInput) {
   });
 }
 
+let allPosts = [];
 function createPost(post) {
   return `
     <div class="project-card">
@@ -41,25 +42,41 @@ function createPost(post) {
   `;
 }
 const loading = document.querySelector('#loading');
-const PostsContainer = document.querySelector('#posts-container');
 async function loadPosts() {
   try {
     const response = await fetch('https://jsonplaceholder.typicode.com/posts');
     if (!response.ok) {
-      throw new Error('Server error');
+      throw new Error('Помилка сервера');
     }
     const data = await response.json();
-    const html = data.slice(0, 5)
-      .map(post => createPost(post))
-      .join('');
-    PostsContainer.innerHTML = html;
+    allPosts = data.slice(0, 10);
+    renderPosts(allPosts);
     loading.style.display = 'none';
   } catch (error) {
     console.error(error);
-    loading.textContent = 'Помилка завантаження даних';
+    loading.textContent = 'Помилка завантаження';
   }
 }
+const PostsContainer = document.querySelector('#posts-container');
+function renderPosts(list) {
+  if (!PostsContainer) return;
+  const html = list
+    .map(post => createPost(post))
+    .join('');
+  PostsContainer.innerHTML = html;
+}
 loadPosts();
+renderPosts(allPosts);
+const postsSearchInput = document.querySelector('#posts-search-input');
+if (postsSearchInput) {
+  postsSearchInput.addEventListener('input', () => {
+    const value = postsSearchInput.value.toLowerCase();
+    const filtered = allPosts.filter(post =>
+      post.title.toLowerCase().includes(value)
+    );
+    renderPosts(filtered);
+  });
+}
 
 const themeBtn = document.querySelector('#theme-toggle');
 const bodyElement = document.body;
