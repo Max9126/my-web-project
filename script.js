@@ -13,10 +13,10 @@ function createProjectCard(project) {
     </div>
   `;
 }
-const container = document.querySelector('div.projects-container');
+const ProjectsContainer = document.querySelector('div.projects-container');
 function renderProjects(list) {
-  if (!container) return;
-  container.innerHTML = list
+  if (!ProjectsContainer) return;
+  ProjectsContainer.innerHTML = list
     .map(project => createProjectCard(project))
     .join('');
 }
@@ -31,6 +31,35 @@ if (searchInput) {
     renderProjects(filtered);
   });
 }
+
+function createPost(post) {
+  return `
+    <div class="project-card">
+      <h3>${post.title}</h3>
+      <p>${post.body}</p>
+    </div>
+  `;
+}
+const loading = document.querySelector('#loading');
+const PostsContainer = document.querySelector('#posts-container');
+async function loadPosts() {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+    if (!response.ok) {
+      throw new Error('Server error');
+    }
+    const data = await response.json();
+    const html = data.slice(0, 5)
+      .map(post => createPost(post))
+      .join('');
+    PostsContainer.innerHTML = html;
+    loading.style.display = 'none';
+  } catch (error) {
+    console.error(error);
+    loading.textContent = 'Помилка завантаження даних';
+  }
+}
+loadPosts();
 
 const themeBtn = document.querySelector('#theme-toggle');
 const bodyElement = document.body;
